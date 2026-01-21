@@ -1,0 +1,10 @@
+.idea
+__cache__
+runs/
+test/
+train/
+valid/
+videos/
+backend/runs/
+backend/uploads/
+backend/.env

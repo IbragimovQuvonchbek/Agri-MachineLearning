@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 10
+names: ['Fresh_Carrot', 'Fresh_Cucumber', 'Fresh_Pepper', 'Fresh_Potato', 'Fresh_Tomato', 'Rotten_Carrot', 'Rotten_Cucumber', 'Rotten_Pepper', 'Rotten_Potato', 'Rotten_Tomato']
+
+roboflow:
+  workspace: university-of-southeastern-philippines-1gzgx
+  project: fresh-and-rottten-vegetable
+  version: 10
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/university-of-southeastern-philippines-1gzgx/fresh-and-rottten-vegetable/dataset/10

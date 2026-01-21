@@ -1,5 +1,6 @@
 .idea
-__cache__
+__pycache__
+backend/__pycache__
 runs/
 test/
 train/

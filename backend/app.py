@@ -175,7 +175,7 @@ def chat(req: ChatRequest):
         answer = ask_llm(
             system_prompt=system_prompt,
             user_prompt=user_prompt,
-            provider="openai"   # ✅ change to 'deepseek' if needed
+            provider="openrouter"
         )
         return {"answer": answer}
 

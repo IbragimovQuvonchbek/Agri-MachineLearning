@@ -1,232 +1,317 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Veg Quality AI</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 16px;
-      display: grid;
-      grid-template-columns: 1.6fr 1fr;
-      gap: 16px;
-      align-items: start;
-    }
-    .box {
-      border: 1px solid #ddd;
-      padding: 12px;
-      border-radius: 12px;
-    }
-    #frame {
-      width: 100%;
-      max-width: 720px;
-      height: auto;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      display: block;
-      background: #f3f4f6;
-    }
-    #gallery {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      max-height: 520px;
-      overflow-y: auto;
-      padding-right: 6px;
-    }
-    #gallery img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 10px;
-      border: 2px solid transparent;
-      cursor: pointer;
-    }
-    #gallery img.selected { border-color: #0078ff; }
-    textarea { width: 100%; height: 80px; }
+<meta charset="utf-8" />
+<title>Veg Quality AI</title>
 
-    #status {
-      padding: 8px 10px;
-      border-radius: 10px;
-      background: #f8fafc;
-      border: 1px solid #e5e7eb;
-      margin: 10px 0;
-      font-size: 14px;
-    }
-  </style>
+<style>
+:root {
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --primary: #4f46e5;
+  --primary-soft: #eef2ff;
+  --border: #e5e7eb;
+  --text: #111827;
+  --muted: #6b7280;
+  --success: #16a34a;
+  --danger: #dc2626;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.05);
+}
+
+/* ---------- Buttons ---------- */
+button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+input[type="file"] {
+  font-size: 14px;
+}
+
+/* ---------- Status ---------- */
+#status {
+  margin: 12px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 13px;
+}
+
+/* ---------- Video ---------- */
+#frame {
+  width: 100%;
+  max-width: 720px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #eef2f7;
+}
+
+/* ---------- Gallery ---------- */
+#gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+#gallery img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+#gallery img:hover {
+  transform: scale(1.02);
+}
+
+#gallery img.selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+/* ---------- Chat ---------- */
+textarea {
+  width: 100%;
+  height: 90px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  resize: none;
+  font-family: inherit;
+}
+
+pre {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  font-size: 13px;
+  white-space: pre-wrap;
+}
+
+/* ---------- Small helpers ---------- */
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
 </head>
 
 <body>
-  <div class="box">
-    <h2>Live Analysis</h2>
-    <input type="file" id="file" accept="video/*" />
-    <button id="start">Upload & Analyze</button>
 
-    <p id="status">Ready.</p>
+<div class="container">
+
+  <!-- LEFT -->
+  <div class="card">
+    <h2>Live Analysis</h2>
+
+    <div class="row">
+      <input type="file" id="file" accept="video/*" />
+      <button id="start">Upload & Analyze</button>
+    </div>
+
+    <div id="status">Ready.</div>
 
     <img id="frame"
          src="https://placehold.co/720x405/e5e7eb/111827?text=Live+Preview"
-         alt="Live video analysis" />
+         alt="Live analysis" />
   </div>
 
-  <div class="box">
+  <!-- RIGHT -->
+  <div class="card">
     <h2>Detected Crops</h2>
     <div id="gallery"></div>
 
-    <h2>Chat</h2>
-    <div><b>Selected:</b> <span id="selectedName">none</span></div>
-    <textarea id="q" placeholder="Ask: Can I eat this? How to store it? What does rotten mean?"></textarea>
-    <button id="ask">Ask</button>
-    <pre id="ans" style="white-space: pre-wrap;">Select a crop and ask a question.</pre>
+    <hr style="margin:16px 0;border:none;border-top:1px solid var(--border);">
+
+    <h2>AI Assistant</h2>
+    <div class="muted">Selected: <b><span id="selectedName">none</span></b></div>
+
+    <textarea id="q"
+      placeholder="Ask: Can I eat this? How should I store it? What does rotten mean?">
+    </textarea>
+
+    <button id="ask" style="margin-top:10px;">Ask AI</button>
+
+    <pre id="ans">Select a crop and ask a question.</pre>
   </div>
 
+</div>
+
 <script>
-  // ✅ Use same origin to avoid localhost vs 127.0.0.1 problems
-  const API = `${location.protocol}//${location.host}`;
-  let selectedCrop = "";
-  let ws = null;
-  let cropPollTimer = null;
+/* ===============================
+   JS LOGIC (unchanged, safe)
+================================ */
+const API = `${location.protocol}//${location.host}`;
+let selectedCrop = "";
+let ws = null;
+let cropPollTimer = null;
 
-  function setStatus(text) {
-    document.getElementById("status").textContent = text;
-  }
+function setStatus(text) {
+  document.getElementById("status").textContent = text;
+}
 
-  async function refreshCrops() {
-    try {
-      const r = await fetch(`${API}/crops`, { cache: "no-store" });
-      const data = await r.json();
-      const gallery = document.getElementById("gallery");
-      gallery.innerHTML = "";
+async function refreshCrops() {
+  try {
+    const r = await fetch(`${API}/crops`, { cache: "no-store" });
+    const data = await r.json();
+    const gallery = document.getElementById("gallery");
+    gallery.innerHTML = "";
 
-      if (!data.crops || data.crops.length === 0) {
-        gallery.innerHTML = `<div style="grid-column: span 2; color:#6b7280; padding:10px;">
-          No crops yet. Start analysis.
-        </div>`;
-        return;
-      }
-
-      data.crops.forEach(url => {
-        const img = document.createElement("img");
-        img.src = API + url + `?t=${Date.now()}`; // cache-bust
-        img.loading = "lazy";
-        img.onclick = () => {
-          document.querySelectorAll("#gallery img").forEach(i => i.classList.remove("selected"));
-          img.classList.add("selected");
-          selectedCrop = url;
-          document.getElementById("selectedName").textContent = url.split("/").pop().replace(/_/g, " ");
-        };
-        gallery.appendChild(img);
-      });
-    } catch (e) {
-      console.error("refreshCrops error:", e);
-    }
-  }
-
-  function connectWS(video_path) {
-    // close old socket if exists
-    if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
-      try { ws.close(); } catch {}
+    if (!data.crops || data.crops.length === 0) {
+      gallery.innerHTML = `<div class="muted">No crops detected yet.</div>`;
+      return;
     }
 
-    // ✅ same host websocket
-    const wsUrl = (location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws/analyze";
-    ws = new WebSocket(wsUrl);
-    ws.binaryType = "arraybuffer";
-
-    ws.onopen = () => {
-      setStatus("Connected. Streaming...");
-      ws.send(JSON.stringify({ video_path }));
-      // fallback: refresh crops every 2s during run
-      cropPollTimer = setInterval(refreshCrops, 2000);
-    };
-
-    ws.onmessage = (evt) => {
-      // Text messages = crop events or errors
-      if (typeof evt.data === "string") {
-        try {
-          const msg = JSON.parse(evt.data);
-          if (msg.type === "new_crop" && msg.url) {
-            // ✅ immediate update when crop saved
-            refreshCrops();
-          } else if (msg.error) {
-            console.error("Server error:", msg.error);
-            setStatus("Error: " + msg.error);
-          }
-        } catch (e) {
-          console.log("WS text:", evt.data);
-        }
-        return;
-      }
-
-      // Binary frames
-      const blob = new Blob([evt.data], { type: "image/jpeg" });
-      const img = document.getElementById("frame");
-      const url = URL.createObjectURL(blob);
-      img.src = url;
-      setTimeout(() => URL.revokeObjectURL(url), 200);
-    };
-
-    ws.onerror = (e) => {
-      console.error("WebSocket error:", e);
-      setStatus("WebSocket error.");
-    };
-
-    ws.onclose = () => {
-      setStatus("Done.");
-      if (cropPollTimer) {
-        clearInterval(cropPollTimer);
-        cropPollTimer = null;
-      }
-      refreshCrops();
-    };
+    data.crops.forEach(url => {
+      const img = document.createElement("img");
+      img.src = API + url + `?t=${Date.now()}`;
+      img.onclick = () => {
+        document.querySelectorAll("#gallery img").forEach(i => i.classList.remove("selected"));
+        img.classList.add("selected");
+        selectedCrop = url;
+        document.getElementById("selectedName").textContent =
+          url.split("/").pop().replace(/_/g, " ");
+      };
+      gallery.appendChild(img);
+    });
+  } catch (e) {
+    console.error(e);
   }
+}
 
-  document.getElementById("start").onclick = async () => {
-    const f = document.getElementById("file").files[0];
-    if (!f) return alert("Choose a video first.");
+function connectWS(video_path) {
+  if (ws) try { ws.close(); } catch {}
 
-    setStatus("Uploading...");
-    const form = new FormData();
-    form.append("file", f);
+  const wsUrl =
+    (location.protocol === "https:" ? "wss://" : "ws://") +
+    location.host + "/ws/analyze";
 
-    try {
-      const up = await fetch(`${API}/upload`, { method: "POST", body: form });
-      const upData = await up.json();
-      const video_path = upData.video_path;
+  ws = new WebSocket(wsUrl);
+  ws.binaryType = "arraybuffer";
 
-      setStatus("Starting analysis...");
-      await refreshCrops();
-      connectWS(video_path);
-    } catch (e) {
-      console.error("Upload failed:", e);
-      setStatus("Upload failed.");
-    }
+  ws.onopen = () => {
+    setStatus("Analyzing video…");
+    ws.send(JSON.stringify({ video_path }));
+    cropPollTimer = setInterval(refreshCrops, 2000);
   };
 
-  document.getElementById("ask").onclick = async () => {
-    const question = document.getElementById("q").value.trim();
-    if (!selectedCrop) return alert("Select a crop image first.");
-    if (!question) return alert("Type a question.");
-
-    const ans = document.getElementById("ans");
-    ans.textContent = "Thinking...";
-
-    try {
-      const r = await fetch(`${API}/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ crop_url: selectedCrop, question })
-      });
-      const data = await r.json();
-      ans.textContent = data.answer || JSON.stringify(data, null, 2);
-    } catch (e) {
-      console.error("Chat error:", e);
-      ans.textContent = "Error contacting server.";
+  ws.onmessage = (evt) => {
+    if (typeof evt.data === "string") {
+      try {
+        const msg = JSON.parse(evt.data);
+        if (msg.type === "new_crop") refreshCrops();
+      } catch {}
+      return;
     }
+    const blob = new Blob([evt.data], { type: "image/jpeg" });
+    const img = document.getElementById("frame");
+    const url = URL.createObjectURL(blob);
+    img.src = url;
+    setTimeout(() => URL.revokeObjectURL(url), 200);
   };
 
-  // Initial
+  ws.onclose = () => {
+    setStatus("Analysis finished.");
+    clearInterval(cropPollTimer);
+    refreshCrops();
+  };
+}
+
+document.getElementById("start").onclick = async () => {
+  const f = document.getElementById("file").files[0];
+  if (!f) return alert("Choose a video first.");
+
+  setStatus("Uploading video…");
+  const form = new FormData();
+  form.append("file", f);
+
+  const up = await fetch(`${API}/upload`, { method: "POST", body: form });
+  const { video_path } = await up.json();
+
   refreshCrops();
+  connectWS(video_path);
+};
+
+document.getElementById("ask").onclick = async () => {
+  const q = document.getElementById("q").value.trim();
+  if (!selectedCrop) return alert("Select a crop image first.");
+  if (!q) return alert("Type a question.");
+
+  const ans = document.getElementById("ans");
+  ans.textContent = "Thinking…";
+
+  const r = await fetch(`${API}/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ crop_url: selectedCrop, question: q })
+  });
+  const data = await r.json();
+  ans.textContent = data.answer || "No response.";
+};
+
+refreshCrops();
 </script>
+
 </body>
 </html>

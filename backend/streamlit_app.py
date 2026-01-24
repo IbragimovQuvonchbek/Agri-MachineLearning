@@ -3,7 +3,7 @@ import time
 import glob
 import uuid
 from pathlib import Path
-
+import hashlib
 import streamlit as st
 
 from yolo_video import process_video_stream
@@ -36,8 +36,8 @@ def list_crops(run_dir: str) -> list[str]:
     crops_dir = Path(run_dir) / "crops"
     if not crops_dir.exists():
         return []
-    files = sorted([str(p) for p in crops_dir.glob("*.jpg")])
-    return files
+    files = sorted({str(p.resolve()) for p in crops_dir.glob("*.jpg")})
+    return list(files)
 
 
 def pretty_crop_name(path: str) -> str:
@@ -162,7 +162,8 @@ def render_crops_panel():
             with c:
                 st.image(crop_path, use_container_width=True)
                 label = pretty_crop_name(crop_path)
-                if st.button(f"Select: {label}", key=f"sel_{crop_path}"):
+                safe_key = "sel_" + hashlib.md5(crop_path.encode("utf-8")).hexdigest() + f"_{i}"
+                if st.button(f"Select: {label}", key=safe_key):
                     st.session_state.selected_crop = crop_path
 
 

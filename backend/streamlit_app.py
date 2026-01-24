@@ -112,12 +112,13 @@ def yolo_worker(video_path: str, model_path: str, out_q: "queue.Queue", stop_eve
     """
     try:
         for event in process_video_stream(
-            video_path=video_path,
-            model_path=model_path,
-            conf=0.35,
-            iou_thresh=0.5,
-            imgsz=640,
-            max_det=100,
+                video_path=video_path,
+                model_path=model_path,
+                imgsz=416,
+                max_det=20,
+                frame_skip=2,
+                render_fps=8,
+                infer_scale=0.75,
         ):
             if stop_event.is_set():
                 break

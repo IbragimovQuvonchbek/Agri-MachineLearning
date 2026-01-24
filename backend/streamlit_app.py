@@ -158,7 +158,7 @@ def yolo_worker(video_path: str, model_path: str, out_q: "queue.Queue"):
                 out_q.put(("frame", frame_bytes, str(Path(run_dir).resolve())))
             elif et == "new_crop":
                 _, _crop_file, run_dir = event
-                out_q.put(("crop", str(Path(run_dir).resolve())))
+                out_q.put(("crop", str(Path(run_dir).resolve()), None))
 
         out_q.put(("done", None, None))
     except Exception as e:
@@ -247,8 +247,11 @@ try:
             st.session_state["latest_frame"] = frame_bytes
             st.session_state["run_dir"] = run_dir
 
+
         elif kind == "crop":
-            _, run_dir, _ = msg
+
+            _, run_dir = msg
+
             st.session_state["run_dir"] = run_dir
 
         elif kind == "done":

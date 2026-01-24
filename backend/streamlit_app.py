@@ -143,38 +143,58 @@ with right:
 # Actions
 # -------------------------
 def render_crops_panel():
-    # Every time we render, bump a version so keys are unique
-    st.session_state.crops_panel_version += 1
-    v = st.session_state.crops_panel_version
+    """
+    Renders the 'Detected Crops' panel safely (no duplicate keys), even if this
+    function is called many times in the same Streamlit run.
 
-    # IMPORTANT: clear previous UI in this placeholder
+    Assumes these exist in your file (as in your app):
+      - crops_box (st.empty() placeholder)
+      - newest_run_dir()
+      - list_crops(run_dir)
+      - pretty_crop_name(path)
+      - st.session_state.run_dir
+    """
+    # --- Safety init (prevents AttributeError) ---
+    if "crops_panel_version" not in st.session_state:
+        st.session_state["crops_panel_version"] = 0
+
+    # Bump version every render so widget keys never collide across re-renders
+    st.session_state["crops_panel_version"] += 1
+    v = st.session_state["crops_panel_version"]
+
+    # Clear the placeholder before rebuilding UI
     crops_box.empty()
 
-    run_dir = st.session_state.run_dir or newest_run_dir()
+    # Choose run dir
+    run_dir = st.session_state.get("run_dir") or newest_run_dir()
     if not run_dir:
         crops_box.info("No crops detected yet.")
         return
 
-    st.session_state.run_dir = run_dir
-    crops = list_crops(run_dir)
+    st.session_state["run_dir"] = run_dir
+
+    # List crops and dedupe by resolved absolute path (prevents duplicates)
+    crops = list_crops(run_dir) or []
+    crops = sorted({str(Path(p).resolve()) for p in crops})
+
     if not crops:
         crops_box.info("No crops detected yet.")
         return
 
+    # Render gallery
     with crops_box.container():
         cols = st.columns(2, gap="small")
         for i, crop_path in enumerate(crops):
-            c = cols[i % 2]
-            with c:
+            with cols[i % 2]:
                 st.image(crop_path, use_container_width=True)
                 label = pretty_crop_name(crop_path)
 
-                # unique key includes version v + index + hash
-                h = hashlib.md5(str(crop_path).encode("utf-8")).hexdigest()
+                # Unique button key (version + index + stable hash)
+                h = hashlib.sha256(crop_path.encode("utf-8")).hexdigest()[:16]
                 key = f"sel_{v}_{i}_{h}"
 
                 if st.button(f"Select: {label}", key=key):
-                    st.session_state.selected_crop = crop_path
+                    st.session_state["selected_crop"] = crop_path
 
 
 def run_analysis(video_path: str, model_path: str):

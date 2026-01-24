@@ -143,6 +143,13 @@ with right:
 # Actions
 # -------------------------
 def render_crops_panel():
+    # Every time we render, bump a version so keys are unique
+    st.session_state.crops_panel_version += 1
+    v = st.session_state.crops_panel_version
+
+    # IMPORTANT: clear previous UI in this placeholder
+    crops_box.empty()
+
     run_dir = st.session_state.run_dir or newest_run_dir()
     if not run_dir:
         crops_box.info("No crops detected yet.")
@@ -154,7 +161,6 @@ def render_crops_panel():
         crops_box.info("No crops detected yet.")
         return
 
-    # Show selectable gallery
     with crops_box.container():
         cols = st.columns(2, gap="small")
         for i, crop_path in enumerate(crops):
@@ -162,8 +168,12 @@ def render_crops_panel():
             with c:
                 st.image(crop_path, use_container_width=True)
                 label = pretty_crop_name(crop_path)
-                safe_key = "sel_" + hashlib.md5(crop_path.encode("utf-8")).hexdigest() + f"_{i}"
-                if st.button(f"Select: {label}", key=safe_key):
+
+                # unique key includes version v + index + hash
+                h = hashlib.md5(str(crop_path).encode("utf-8")).hexdigest()
+                key = f"sel_{v}_{i}_{h}"
+
+                if st.button(f"Select: {label}", key=key):
                     st.session_state.selected_crop = crop_path
 
 
